@@ -1,11 +1,14 @@
 (relative-include "src/bitset.h")
 
 (defmodule BitSet
-  (defn init [] 
+  (defn empty [] 
    (the (Array Uint64) []))
 
-  (defn init-with-capacity [n] 
-    (the (Array Uint64) (Array.allocate n)))
+  (defn init-with-byte-capacity [n] 
+    (the (Array Uint64) (Array.allocate (to-int (ceil (/ (Double.from-int n) 8.0))))))
+
+  (defn init-with-bit-capacity [n] 
+    (the (Array Uint64) (Array.allocate (to-int (ceil (/ (Double.from-int n) 64.0))))))
 
   (register from-array (Fn [(Ref (Array Uint64))] (Array Uint64)) "BitSet_internal_from_array")
 
