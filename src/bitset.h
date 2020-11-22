@@ -35,7 +35,9 @@ bool BitSet_internal_resize(Array* bitset, size_t newlen, bool padwithzeroes) {
 void BitSet_internal_set(Array* bitset,  size_t i) {
   size_t shiftedi = i >> 6;
   if (shiftedi >= bitset->len) {
-    BitSet_internal_resize(bitset, shiftedi+1, false);
+    size_t newlen = shiftedi+1;
+    BitSet_internal_resize(bitset, newlen, true);
+    assert(bitset->len == newlen);
   }
   ((uint64_t*)(bitset->data))[shiftedi] |= ((uint64_t)1) << (i % 64);
 }
@@ -174,6 +176,7 @@ Array BitSet_internal_union(const Array* restrict b1, const Array* restrict b2) 
   if (b2->len > res.len) {
      size_t oldsize = res.len;
      BitSet_internal_resize(&res, b2->len, false);
+     assert(res.len == b2->len);
      memcpy(resdata + oldsize, b2data + oldsize, (b2->len - oldsize) * sizeof(uint64_t));
   }
   return res;
@@ -242,7 +245,6 @@ size_t BitSet_internal_union_card(const Array* restrict b1, const Array* restric
     answer += __builtin_popcountll ( b1data[k] | b2data[k]);
   }
   if (b2->len > b1->len) {
-    //k = b1->len;
     for (; k + 3 < b2->len; k+=4) {
       answer += __builtin_popcountll(b2data[k]);
       answer += __builtin_popcountll(b2data[k+1]);
@@ -253,7 +255,6 @@ size_t BitSet_internal_union_card(const Array* restrict b1, const Array* restric
       answer += __builtin_popcountll(b2data[k]);
     }
   } else {
-    //k = b2->len;
     for (; k + 3 < b1->len; k+=4) {
       answer += __builtin_popcountll(b1data[k]);
       answer += __builtin_popcountll(b1data[k+1]);
