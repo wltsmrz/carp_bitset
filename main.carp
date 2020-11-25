@@ -1,8 +1,19 @@
 (relative-include "src/bitset.h")
 
 (defmodule BitSet
-  (defn empty [] 
+  (deftemplate = (Fn [&(Array Uint64) &(Array Uint64)] Bool)
+    "bool $NAME(const Array* a1, const Array* a2)"
+    "$DECL { return memcmp(a1->data, a2->data, (a1->len)*sizeof(uint64_t)); }")
+
+  (deftemplate copy (Fn [&(Array Uint64)] (Array Uint64))
+    "Array $NAME(Array* a1)"
+    "$DECL { return Array_copy__Uint64(a1); }")
+
+  (defn zero []
    (the (Array Uint64) []))
+
+  (defn empty? [bs]
+    (Array.empty? bs))
 
   (defn init-with-byte-capacity [n] 
     (the (Array Uint64) (Array.allocate (to-int (ceil (/ (Double.from-int n) 8.0))))))
@@ -10,56 +21,57 @@
   (defn init-with-bit-capacity [n] 
     (the (Array Uint64) (Array.allocate (to-int (ceil (/ (Double.from-int n) 64.0))))))
 
-  (register from-array (Fn [(Ref (Array Uint64))] (Array Uint64)) "BitSet_internal_from_array")
+  (register from-array (Fn [&(Array Uint64)] (Array Uint64)) "BitSet_internal_from_array")
 
-  (register str (Fn [(Ref (Array Uint64))] String) "BitSet_internal_str")
-  (register add! (Fn [(Ref (Array Uint64)) Uint64] ()) "BitSet_internal_set")
-  (register card (Fn [(Ref (Array Uint64))] Int) "BitSet_internal_card")
-  (register min (Fn [(Ref (Array Uint64))] Int) "BitSet_internal_minimum")
-  (register max (Fn [(Ref (Array Uint64))] Int) "BitSet_internal_maximum")
-  (register contains? (Fn [(Ref (Array Uint64)) Uint64] Bool) "BitSet_internal_get")
+  (register str (Fn [&(Array Uint64)] String) "BitSet_internal_str")
+
+  (register add! (Fn [&(Array Uint64) Uint64] ()) "BitSet_internal_set")
+  (register card (Fn [&(Array Uint64)] Int) "BitSet_internal_card")
+  (register min (Fn [&(Array Uint64)] Int) "BitSet_internal_minimum")
+  (register max (Fn [&(Array Uint64)] Int) "BitSet_internal_maximum")
+  (register contains? (Fn [&(Array Uint64) Uint64] Bool) "BitSet_internal_get")
   (register disjoint? (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Bool) "BitSet_internal_disjoint")
   (register intersect? (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Bool) "BitSet_internal_intersect")
   (register contains-all? (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Bool) "BitSet_internal_contains_all")
   (register union (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] (Array Uint64)) "BitSet_internal_union")
   (register intersection (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] (Array Uint64)) "BitSet_internal_intersection")
   (register difference (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] (Array Uint64)) "BitSet_internal_difference")
   (register symmetric-difference (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] (Array Uint64)) "BitSet_internal_symmetric_difference")
   (register union-card (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Int) "BitSet_internal_union_card")
   (register intersection-card (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Int) "BitSet_internal_intersection_card")
   (register difference-card (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Int) "BitSet_internal_difference_card")
   (register symmetric-difference-card (Fn [
-        (Ref (Array Uint64))
-        (Ref (Array Uint64))
+        &(Array Uint64)
+        &(Array Uint64)
         ] Int) "BitSet_internal_symmetric_difference_card")
 )
