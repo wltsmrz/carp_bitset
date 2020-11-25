@@ -3,7 +3,7 @@
 Bitsets for Carp - mostly in C and borrowed from Mr. Daniel Lemire's [cbitset](https://github.com/lemire/cbitset/), cleaned up and made Carp-like
 
 ```clojure
-(load "https://github.com/wltsmrz/carp_bitset@v0.1.0")
+(load "https://github.com/wltsmrz/carp_bitset@v0.2.0")
 (load "Test.carp")
 (use Test)
 
@@ -14,21 +14,30 @@ Bitsets for Carp - mostly in C and borrowed from Mr. Daniel Lemire's [cbitset](h
 (def s5 (BitSet.from-array &[ (Uint64.from-long 1l) (Uint64.from-long 3l) (Uint64.from-long 5l) ]))
 
 (deftest test
+  ; equality
+  (assert-equal test &(BitSet.zero) &(BitSet.zero) "BitSet.= z z")
+  (assert-equal test &(BitSet.zero) &(BitSet.init-with-byte-capacity 0) "BitSet.= z B0")
+  (assert-equal test &(BitSet.zero) &(BitSet.init-with-bit-capacity 0) "BitSet.= z b0")
+  (assert-equal test &s1 &s1 "BitSet.= s1 s1")
+  (assert-not-equal test &(BitSet.zero) &(BitSet.init-with-bit-capacity 1) "BitSet.= z b1")
+  (assert-not-equal test &(BitSet.zero) &s1 "BitSet.= z s1")
+  (assert-not-equal test &s2 &s1 "BitSet.= s2 s1")
+
   ; resizing
-  (let-do [bitset (BitSet.empty)]
+  (let-do [bitset (BitSet.zero)]
     (assert-equal test 0 (Array.length &bitset) "resizing")
   )
-  (let-do [bitset (BitSet.empty)]
+  (let-do [bitset (BitSet.zero)]
     (BitSet.add! &bitset (Uint64.from-long 63l))
     (assert-equal test 1 (Array.length &bitset) "resizing")
   )
-  (let-do [bitset (BitSet.empty)]
+  (let-do [bitset (BitSet.zero)]
     (BitSet.add! &bitset (Uint64.from-long 64l))
     (assert-equal test 2 (Array.length &bitset) "resizing")
   )
 
   ; init
-  (assert-equal test 0 (Array.length &(BitSet.empty)) "BitSet.empty size")
+  (assert-equal test 0 (Array.length &(BitSet.zero)) "BitSet.zero size")
 
   (assert-equal test 1 (Array.length &(BitSet.init-with-byte-capacity 1)) "BitSet.init-with-byte-capacity size")
   (assert-equal test 1 (Array.length &(BitSet.init-with-byte-capacity 8)) "BitSet.init-with-byte-capacity size")
@@ -106,4 +115,3 @@ Bitsets for Carp - mostly in C and borrowed from Mr. Daniel Lemire's [cbitset](h
   (assert-equal test "BitSet{1 3 5}" &(BitSet.str &(BitSet.symmetric-difference &s1 &s4)) "BitSet.str(BitSet.symmetric-difference)")
 )
 ```
-
