@@ -343,8 +343,23 @@ bool BitSet_internal_contains_all(const Array* restrict b1, const Array* restric
   return true;
 }
 
+int BitSet_internal_capacity(const Array* bitset) {
+  return bitset->capacity;
+}
+
+Array BitSet_internal_init_with_capacity(int len) {
+  Array bitset = {
+    .len = 0,
+    .capacity = len,
+    .data = (uint64_t*)CARP_MALLOC(len * sizeof(uint64_t))
+  };
+  memset(bitset.data, 0, len * sizeof(uint64_t));
+  return bitset;
+}
+
 Array BitSet_internal_from_array(const Array* in) {
-  Array bitset = {.len = 0, .capacity = 0, .data = NULL};
+  Array bitset = BitSet_internal_init_with_capacity(in->capacity);
+  bitset.len = in->len;
   const uint64_t* data = (uint64_t*)in->data;
   for (size_t i = 0; i < in->len; i++) {
     BitSet_internal_set(&bitset, data[i]);

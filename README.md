@@ -3,7 +3,7 @@
 Bitsets for Carp - mostly in C and borrowed from Mr. Daniel Lemire's [cbitset](https://github.com/lemire/cbitset/), cleaned up and made Carp-like
 
 ```clojure
-(load "https://github.com/wltsmrz/carp_bitset@v0.2.0")
+(load "https://github.com/wltsmrz/carp_bitset@v0.3.0")
 (load "Test.carp")
 (use Test)
 
@@ -15,42 +15,27 @@ Bitsets for Carp - mostly in C and borrowed from Mr. Daniel Lemire's [cbitset](h
 
 (deftest test
   ; equality
-  (assert-equal test &(BitSet.zero) &(BitSet.zero) "BitSet.= z z")
-  (assert-equal test &(BitSet.zero) &(BitSet.init-with-byte-capacity 0) "BitSet.= z B0")
-  (assert-equal test &(BitSet.zero) &(BitSet.init-with-bit-capacity 0) "BitSet.= z b0")
-  (assert-equal test &s1 &s1 "BitSet.= s1 s1")
-  (assert-not-equal test &(BitSet.zero) &(BitSet.init-with-bit-capacity 1) "BitSet.= z b1")
-  (assert-not-equal test &(BitSet.zero) &s1 "BitSet.= z s1")
-  (assert-not-equal test &s2 &s1 "BitSet.= s2 s1")
-
-  ; resizing
-  (let-do [bitset (BitSet.zero)]
-    (assert-equal test 0 (Array.length &bitset) "resizing")
-  )
-  (let-do [bitset (BitSet.zero)]
-    (BitSet.add! &bitset (Uint64.from-long 63l))
-    (assert-equal test 1 (Array.length &bitset) "resizing")
-  )
-  (let-do [bitset (BitSet.zero)]
-    (BitSet.add! &bitset (Uint64.from-long 64l))
-    (assert-equal test 2 (Array.length &bitset) "resizing")
-  )
+  (assert-true test (BitSet.= &(BitSet.zero) &(BitSet.zero)) "BitSet.= z z")
+  (assert-true test (BitSet.= &(BitSet.zero) &(BitSet.init-with-byte-capacity 0)) "BitSet.= z B0")
+  (assert-true test (BitSet.= &(BitSet.zero) &(BitSet.init-with-bit-capacity 0)) "BitSet.= z b0")
+  (assert-true test (BitSet.= &s1 &s1) "BitSet.= s1 s1")
+  (assert-true test (BitSet.= &(BitSet.zero) &(BitSet.init-with-bit-capacity 1)) "BitSet.= z b1")
+  (assert-false test (BitSet.= &(BitSet.zero) &s1) "BitSet.= z s1")
+  (assert-false test (BitSet.= &s2 &s1) "BitSet.= s2 s1")
+  (assert-false test (BitSet.= &s4 &s1) "BitSet.= s4 s1")
 
   ; init
-  (assert-equal test 0 (Array.length &(BitSet.zero)) "BitSet.zero size")
-
-  (assert-equal test 1 (Array.length &(BitSet.init-with-byte-capacity 1)) "BitSet.init-with-byte-capacity size")
-  (assert-equal test 1 (Array.length &(BitSet.init-with-byte-capacity 8)) "BitSet.init-with-byte-capacity size")
-  (assert-equal test 2 (Array.length &(BitSet.init-with-byte-capacity 9)) "BitSet.init-with-byte-capacity size")
-
-  (assert-equal test 1 (Array.length &(BitSet.init-with-bit-capacity 1)) "BitSet.init-with-bit-capacity size")
-  (assert-equal test 1 (Array.length &(BitSet.init-with-bit-capacity 64)) "BitSet.init-with-bit-capacity size")
-  (assert-equal test 2 (Array.length &(BitSet.init-with-bit-capacity 65)) "BitSet.init-with-bit-capacity size")
-
-  (assert-equal test 0 (Array.length &(BitSet.from-array &[ ])) "BitSet.from-array size")
-  (assert-equal test 1 (Array.length &(BitSet.from-array &[ (Uint64.from-long 1l) ])) "BitSet.from-array size")
-  (assert-equal test 1 (Array.length &(BitSet.from-array &[ (Uint64.from-long 1l) (Uint64.from-long 1l) ])) "BitSet.from-array size")
-  (assert-equal test 2 (Array.length &(BitSet.from-array &[ (Uint64.from-long 1l) (Uint64.from-long 64l) ])) "BitSet.from-array size")
+  (assert-equal test 0 (BitSet.capacity &(BitSet.zero)) "BitSet.zero capacity")
+  (assert-equal test 0 (BitSet.capacity &(BitSet.init-with-byte-capacity 0)) "BitSet.init-with-byte-capacity capacity")
+  (assert-equal test 1 (BitSet.capacity &(BitSet.init-with-byte-capacity 1)) "BitSet.init-with-byte-capacity capacity")
+  (assert-equal test 1 (BitSet.capacity &(BitSet.init-with-byte-capacity 8)) "BitSet.init-with-byte-capacity capacity")
+  (assert-equal test 2 (BitSet.capacity &(BitSet.init-with-byte-capacity 9)) "BitSet.init-with-byte-capacity capacity")
+  (assert-equal test 1 (BitSet.capacity &(BitSet.init-with-bit-capacity 1)) "BitSet.init-with-bit-capacity capacity")
+  (assert-equal test 1 (BitSet.capacity &(BitSet.init-with-bit-capacity 64)) "BitSet.init-with-bit-capacity capacity")
+  (assert-equal test 2 (BitSet.capacity &(BitSet.init-with-bit-capacity 65)) "BitSet.init-with-bit-capacity capacity")
+  (assert-equal test 0 (BitSet.capacity &(BitSet.from-array &[ ])) "BitSet.from-array capacity")
+  (assert-equal test 1 (BitSet.capacity &(BitSet.from-array &[ (Uint64.from-long 1l) ])) "BitSet.from-array capacity")
+  (assert-equal test 2 (BitSet.capacity &(BitSet.from-array &[ (Uint64.from-long 1l) (Uint64.from-long 64l) ])) "BitSet.from-array capacity")
 
   ; api
   (assert-equal test 3 (BitSet.card &s1) "BitSet.card")
