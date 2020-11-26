@@ -3,18 +3,9 @@
 (defmodule BitSet
   (register = (Fn [&(Array Uint64) &(Array Uint64)] Bool) "BitSet_internal_contains_all")
 
-  (register init-with-capacity (Fn [Int] (Array Uint64)) "BitSet_internal_init_with_capacity")
-
-  (defn empty? [bs]
-    (Array.empty? (the &(Array Uint64) bs)))
-
   (register capacity (Fn [&(Array Uint64)] Int) "BitSet_internal_capacity")
 
-  (defn copy [bs]
-   (the (Array Uint64) (Array.copy (the &(Array Uint64) bs))))
-
-  (defn zero []
-   (the (Array Uint64) []))
+  (register init-with-capacity (Fn [Int] (Array Uint64)) "BitSet_internal_init_with_capacity")
 
   (defn init-with-byte-capacity [n] 
     (the (Array Uint64) (init-with-capacity (to-int (ceil (/ (Double.from-int n) 8.0))))))
@@ -23,6 +14,9 @@
     (the (Array Uint64) (init-with-capacity (to-int (ceil (/ (Double.from-int n) 64.0))))))
 
   (register from-array (Fn [&(Array Uint64)] (Array Uint64)) "BitSet_internal_from_array")
+
+  (defn zero []
+   (the (Array Uint64) []))
 
   (register str (Fn [&(Array Uint64)] String) "BitSet_internal_str")
 
